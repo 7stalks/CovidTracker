@@ -78,7 +78,7 @@ def get_combined_row_data(start_date, state=None, county=None):
         covid_result = OrderedDict([
             ("County", local_counties[county].get('county')),
             ("State", local_counties[county].get('state')),
-            ("Poplulation", local_counties[county].get('population')),
+            ("Population", local_counties[county].get('population')),
         ])
         for key, data in covid_data.items():
             if key == county:
