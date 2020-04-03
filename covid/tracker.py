@@ -2,7 +2,7 @@ import csv
 import datetime
 import re
 import sys
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 import requests
 
@@ -61,9 +61,37 @@ def get_combined_row_data(start_date, state=None, county=None):
             else:
                 local_counties[(county_key, state_key)] = data
                 found_counties.append((county_key, state_key))
-        elif state and state.lower() == state_key:
+        elif state and state.lower() == state_key and county is None:
             local_counties[(county_key, state_key)] = data
             found_counties.append((county_key, state_key))
 
     print("Narrowed down to %s" % len(found_counties))
 
+    # Now lets fill in the gaps in data..
+
+    covid_results = []
+    baseline_start_date = datetime.date(2019, 1, 1)
+    prior_result = {'cases': 0, 'deaths': 0, 'date': baseline_start_date}
+    found_counties.sort()
+    for county in found_counties:
+        baseline_start_date = datetime.date(2019, 1, 1)
+        covid_result = OrderedDict([
+            ("County", local_counties[county].get('county')),
+            ("State", local_counties[county].get('state')),
+            ("Poplulation", local_counties[county].get('population')),
+        ])
+        for key, data in covid_data.items():
+            if key == county:
+                while baseline_start_date <= datetime.date.today():
+                    result = next((x for x in data if x['date'] == baseline_start_date), None)
+                    if not result:
+                        result = prior_result
+                    if baseline_start_date >= start_date:
+                        covid_result["%s" % result['date']] = {
+                            k: v for k, v in result.items() if k in ['cases', 'deaths']
+                        }
+                    if 'county' in result:
+                        prior_result = result
+                    baseline_start_date += datetime.timedelta(days=1)
+                covid_results.append(covid_result)
+    return covid_results

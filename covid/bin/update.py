@@ -1,4 +1,5 @@
 import datetime
+import json
 import sys
 
 try:
@@ -14,8 +15,10 @@ def main():
     # print(county_data[('maricopa', 'arizona')])
     # print(covid_data[('maricopa', 'arizona')][-1])
 
-    results = get_combined_row_data(start_date=datetime.date(2020,3, 15), state='arizona')
-    print(results)
+    results = get_combined_row_data(start_date=datetime.date(2020,3, 30),
+                                    county="maricopa", state='arizona')
+
+    print(json.dumps(results, indent=3))
 
 
     # url = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv'
