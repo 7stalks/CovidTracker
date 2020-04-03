@@ -44,7 +44,8 @@ def get_covid_data():
     return results
 
 
-def get_combined_row_data(start_date, state=None, county=None):
+
+def get_combined_row_data(start_date, state=None, county=None, data_types=['cases', 'deaths']):
     """We need to combine these out."""
 
     county_data = get_county_census_data()
@@ -70,26 +71,35 @@ def get_combined_row_data(start_date, state=None, county=None):
     # Now lets fill in the gaps in data..
 
     covid_results = []
-    baseline_start_date = datetime.date(2019, 1, 1)
-    prior_result = {'cases': 0, 'deaths': 0, 'date': baseline_start_date}
     found_counties.sort()
     for county in found_counties:
         baseline_start_date = datetime.date(2019, 1, 1)
+        prior_result = {'cases': 0, 'deaths': 0, 'date': baseline_start_date}
         covid_result = OrderedDict([
             ("County", local_counties[county].get('county')),
             ("State", local_counties[county].get('state')),
             ("Population", local_counties[county].get('population')),
         ])
+
+        if not isinstance(data_types, (list, tuple)):
+            covid_result['Initial Case'] = None
+            covid_result['Datatype'] = data_types
         for key, data in covid_data.items():
             if key == county:
                 while baseline_start_date <= datetime.date.today():
                     result = next((x for x in data if x['date'] == baseline_start_date), None)
-                    if not result:
+                    if result is None:
+                        prior_result['date'] = baseline_start_date
                         result = prior_result
+                    elif 'Initial Case' in covid_result and covid_result['Initial Case'] is None:
+                        covid_result['Initial Case'] = '%s' % result['date']
                     if baseline_start_date >= start_date:
-                        covid_result["%s" % result['date']] = {
-                            k: v for k, v in result.items() if k in ['cases', 'deaths']
-                        }
+                        if isinstance(data_types, (list, tuple)):
+                            covid_result["%s" % result['date']] = {
+                                k: v for k, v in result.items() if k in ['cases', 'deaths']
+                            }
+                        else:
+                            covid_result["%s" % result['date']] = result.get(data_types, 0)
                     if 'county' in result:
                         prior_result = result
                     baseline_start_date += datetime.timedelta(days=1)
