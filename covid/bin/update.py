@@ -1,6 +1,7 @@
 import csv
 import datetime
 import json
+import os
 import sys
 
 try:
@@ -15,16 +16,16 @@ def main():
 
     areas = [
         {'state': 'arizona'},
-        {'county': 'new york city'},
-        {'county': 'los angeles'},
-        {'county': 'snohomish'}
+        # {'county': 'new york city'},
+        # {'county': 'los angeles'},
+        # {'county': 'snohomish'}
     ]
 
     results = []
     for area in areas:
         results += get_combined_row_data(start_date=start_date, data_types=data_type, **area)
 
-    output = 'covid_info.csv'
+    output = os.path.expanduser('~/Downloads/covid_info-%s.csv' % datetime.date.today())
     with open(output, 'w', newline='') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=results[0].keys())
         writer.writeheader()

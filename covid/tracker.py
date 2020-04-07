@@ -45,7 +45,8 @@ def get_covid_data():
 
 
 
-def get_combined_row_data(start_date, state=None, county=None, data_types=['cases', 'deaths']):
+def get_combined_row_data(start_date, state=None, county=None, data_types=['cases', 'deaths'],
+                          include_census=False):
     """We need to combine these out."""
 
     county_data = get_county_census_data()
@@ -75,18 +76,21 @@ def get_combined_row_data(start_date, state=None, county=None, data_types=['case
     for county in found_counties:
         baseline_start_date = datetime.date(2019, 1, 1)
         prior_result = {'cases': 0, 'deaths': 0, 'date': baseline_start_date}
-        covid_result = OrderedDict([
-            ("County", local_counties[county].get('county')),
-            ("State", local_counties[county].get('state')),
-            ("Population", local_counties[county].get('population')),
-        ])
 
-        if not isinstance(data_types, (list, tuple)):
+        covid_result = OrderedDict([("County", local_counties[county].get('county'))])
+        if include_census:
+            covid_result = OrderedDict([
+                ("County", local_counties[county].get('county')),
+                ("State", local_counties[county].get('state')),
+                ("Population", local_counties[county].get('population')),
+            ])
+
+        if not isinstance(data_types, (list, tuple)) and include_census:
             covid_result['Initial Case'] = None
             covid_result['Datatype'] = data_types
         for key, data in covid_data.items():
             if key == county:
-                while baseline_start_date <= datetime.date.today():
+                while baseline_start_date < datetime.date.today():
                     result = next((x for x in data if x['date'] == baseline_start_date), None)
                     if result is None:
                         prior_result['date'] = baseline_start_date
