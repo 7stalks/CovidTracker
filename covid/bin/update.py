@@ -31,7 +31,18 @@ def main():
         writer = csv.DictWriter(csvfile, fieldnames=results[0].keys())
         writer.writeheader()
         for row in results:
-            print(row)
+            writer.writerow(row)
+
+
+    results = []
+    results += get_combined_row_data(start_date=start_date, data_types=data_type,
+                                     my_county="new york city",  county="new york city")
+
+    output = os.path.expanduser('~/Downloads/covid_info-ny-%s.csv' % datetime.date.today())
+    with open(output, 'w', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=results[0].keys())
+        writer.writeheader()
+        for row in results:
             writer.writerow(row)
 
 
