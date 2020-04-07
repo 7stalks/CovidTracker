@@ -23,13 +23,15 @@ def main():
 
     results = []
     for area in areas:
-        results += get_combined_row_data(start_date=start_date, data_types=data_type, **area)
+        results += get_combined_row_data(start_date=start_date, data_types=data_type,
+                                         my_county="maricopa",  **area,)
 
     output = os.path.expanduser('~/Downloads/covid_info-%s.csv' % datetime.date.today())
     with open(output, 'w', newline='') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=results[0].keys())
         writer.writeheader()
         for row in results:
+            print(row)
             writer.writerow(row)
 
 
