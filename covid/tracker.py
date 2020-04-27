@@ -73,7 +73,7 @@ def get_combined_row_data(start_date, state=None, county=None, data_types=['case
 
     covid_results = []
     found_counties.sort()
-    my_county_1x_rate = {'County': '% 1x day/day growth' % my_county}
+    my_county_1x_rate = {'County': '%s 1x day/day growth' % my_county}
     for county in found_counties:
         baseline_start_date = datetime.date(2019, 1, 1)
         prior_result = {'cases': 0, 'deaths': 0, 'date': baseline_start_date}
