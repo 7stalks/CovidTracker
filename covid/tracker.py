@@ -73,7 +73,7 @@ def get_combined_row_data(start_date, state=None, county=None, data_types=['case
 
     covid_results = []
     found_counties.sort()
-    my_county_1x_rate = {'County': '1x day/day growth'}
+    my_county_1x_rate = {'County': '% 1x day/day growth' % my_county}
     for county in found_counties:
         baseline_start_date = datetime.date(2019, 1, 1)
         prior_result = {'cases': 0, 'deaths': 0, 'date': baseline_start_date}
@@ -93,7 +93,6 @@ def get_combined_row_data(start_date, state=None, county=None, data_types=['case
             if key == county:
                 while baseline_start_date < datetime.date.today():
                     result = next((x for x in data if x['date'] == baseline_start_date), None)
-                    print(result)
                     if result is None:
                         prior_result['date'] = baseline_start_date
                         result = prior_result
@@ -116,5 +115,7 @@ def get_combined_row_data(start_date, state=None, county=None, data_types=['case
                 covid_results.append(covid_result)
     if my_county:
         covid_results.append({k: None for k in covid_results[0].keys()})
+        covid_results.append({k: None for k in covid_results[0].keys()})
+        covid_results.append({k: k for k in covid_results[0].keys()})
         covid_results.append({k: my_county_1x_rate.get(k) for k in covid_results[0].keys()})
     return covid_results
