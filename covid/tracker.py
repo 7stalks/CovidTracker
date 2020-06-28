@@ -67,7 +67,7 @@ def get_combined_row_data(start_date, state=None, county=None, data_types=['case
             local_counties[(county_key, state_key)] = data
             found_counties.append((county_key, state_key))
 
-    print("Narrowed down to %s" % len(found_counties))
+    print("\nNarrowed down to %s based on %r" %(len(found_counties), state if state else county))
 
     # Now lets fill in the gaps in data..
 
@@ -91,6 +91,8 @@ def get_combined_row_data(start_date, state=None, county=None, data_types=['case
             covid_result['Datatype'] = data_types
         for key, data in covid_data.items():
             if key == county:
+                print("  County: {:<16} Population: {:,}".format(
+                    covid_result['County'], local_counties[county].get('population')))
                 while baseline_start_date < datetime.date.today():
                     result = next((x for x in data if x['date'] == baseline_start_date), None)
                     if result is None:
@@ -118,4 +120,7 @@ def get_combined_row_data(start_date, state=None, county=None, data_types=['case
         covid_results.append({k: None for k in covid_results[0].keys()})
         covid_results.append({k: k for k in covid_results[0].keys()})
         covid_results.append({k: my_county_1x_rate.get(k) for k in covid_results[0].keys()})
+        latest_day = list(covid_results[0].keys())[-1]
+        print("\n   %s county latest rate is current %s cases/hour for %s" % (
+            my_county, my_county_1x_rate[latest_day], latest_day))
     return covid_results
