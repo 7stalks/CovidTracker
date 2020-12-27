@@ -39,7 +39,10 @@ def get_covid_data():
                                     int(row['date'].split("-")[1]),
                                     int(row['date'].split("-")[2]))
         row['cases'] = int(row['cases'])
-        row['deaths'] = int(row['deaths'])
+        try:
+            row['deaths'] = int(row['deaths'])
+        except ValueError:
+            row['deaths'] = 0
         results[key].append(row)
     return results
 
